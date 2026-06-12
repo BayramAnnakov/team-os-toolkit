@@ -10,7 +10,7 @@ Configure, don't implement. This skill resolves ROBIN-SPEC's implementation-defi
 ## Preconditions
 
 1. Locate the upstream spec: `ROBIN-SPEC.md` in the current directory or a user-supplied path; if neither exists, ask for it (one question, doesn't count against the budget) — do not proceed without a spec. Record its version: git commit if the spec lives in a git repo, otherwise its `Status:` line + sha256 of the file. Either way the local copy must be diffable against future spec patches.
-2. Locate the team's knowledge repo (TeamOS): the current working directory or its immediate parent — do not search the whole disk. **If none found, stop politely:** "Robin without a knowledge repo is just a bot — run /init-team-os first." This ordering is the product working as designed, not a limitation.
+2. Locate the team's knowledge repo (TeamOS): the current working directory or its immediate parent — do not search the whole disk. **If none found, don't dead-stop — offer the on-ramp:** "Robin without a knowledge repo is just a bot. Run `/init-team-os` now? It's ≤5 questions and a few minutes — then we continue here with your real recurring question as Robin's M0 test." There is deliberately no skip path; the fast on-ramp is the answer to "can I jump straight to Robin?".
 
 ## Phase 1 — Mine Before Asking
 

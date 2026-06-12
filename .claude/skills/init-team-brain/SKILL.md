@@ -7,6 +7,8 @@ description: Generate a product-knowledge layer (a "brain") for a team's codebas
 
 Generate the product-knowledge layer on top of a team's code: the exact vocabulary, object model, and current state that agents must not invent — plus the machinery that keeps it from rotting.
 
+The brain is also the **context layer for synthesis tasks**: point any meeting- or customer-interview summarizer at it. A summarizer that doesn't know your product, personas, and terminology produces inadequate summaries even from a perfect transcript — ground it in the glossary and overview first.
+
 ## Principles
 
 1. **Only document what code can verify or humans have judged.** Generate the derivable layer (enums, components, vocabulary) from code; scaffold the judgment layer (pivots, gotchas, strategy) as explicit `TODO(owner)` markers. Never fabricate judgment.
@@ -66,7 +68,8 @@ Into a `*-brain` repo or `brain/` subtree. Every **markdown** file carries owner
 - **Checker contract note** — one paragraph stating that `claims.yaml` is the contract and any agent may re-implement the checker in another language (claims schema + exit/skip semantics above are the whole spec). Lives in the `claims.yaml` comment header, referenced from `AGENTS.md`.
 - `evals/knowledge-impact.md` — with/without harness: same task ± brain, n≥5, blind-ish judging. "If the brain stops winning the eval, the docs have rotted."
 - `MAINTENANCE.md` — who reviews what, on what cadence; volatile docs refresh from the team's weekly meeting.
-- `skills/update-knowledge/SKILL.md` — the weekly sync skill: read the week's reality (meeting notes, git history, team chat), update volatile docs, bump `last_reviewed`, open a PR for human review. Never push directly.
+- `skills/update-knowledge/SKILL.md` — the weekly sync skill: read the week's reality (meeting notes, git history, team chat), update volatile docs, bump `last_reviewed`, open a PR for human review. Never push directly. If a `decisions.md` exists (see `/init-team-decisions`), the sync also runs a **decision-mining pass** (new episodes → `proposed` entries, same PR) and a **principles revisit** (propose retire/amend for principles the week contradicted; note confirmations — recurrence strengthens the lean; principles age in public, not silently).
+- `skills/README.md` — the skill registry: one table (skill · for whom · what it does), install instructions (symlink so updates propagate), and — if a team agent consumes these skills — the **pointer-skill contract**: the agent's own skill registry holds thin pointers (trigger frontmatter + "read the canonical SKILL.md under the synced mount"), never copies; edits propagate on sync; the only manual step is updating a pointer's trigger metadata when a skill's scope changes.
 
 Show the user each file's substance before writing.
 
@@ -79,4 +82,4 @@ Show the user each file's substance before writing.
 
 ## Phase 5 — Hand Off
 
-Report: claims active, files generated, judgment TODOs awaiting owners, the weekly cadence, and the eval as the standing health check. Point to `/robin-init` when the team wants the brain to answer questions in chat.
+Report: claims active, files generated, judgment TODOs awaiting owners, the weekly cadence, and the eval as the standing health check. Point to `/init-team-decisions` when "how do we decide X" questions recur, and to `/robin-init` when the team wants the brain to answer questions in chat.

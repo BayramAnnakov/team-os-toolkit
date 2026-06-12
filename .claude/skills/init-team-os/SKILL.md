@@ -71,7 +71,7 @@ Present findings grouped (recurring questions / re-explained context / tools / p
 
 - ONE enforcement hook (e.g., frontmatter check or kebab-case check) — `git init` the repo first if it isn't one, then demonstrate the hook FAILING on a bad commit before trusting it.
 - `gh repo create <name> --private --source=. --push` if they want it shared now.
-- Point to `/init-team-brain` when they're ready for the product-knowledge layer with drift detection.
+- Point to `/init-team-brain` when they're ready for the product-knowledge layer with drift detection, and to `/init-team-decisions` when the mined evidence shows recurring "what would <the lead> say?" / "should we do X or Y?" questions — that signal wants the judgment layer, not another doc.
 
 ## Rules
 
