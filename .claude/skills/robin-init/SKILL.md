@@ -38,7 +38,7 @@ Ask only what mining cannot answer:
 Robin is a chief of staff, and a chief of staff's job differs by team — so identity and duties are THEIR files, drafted here and versioned in THEIR repo, changed by PR rather than by reconfiguring Robin.
 
 1. **Draft `soul.md`** — mine the TeamOS repo first (roster, product description, the language the team writes in, tone of existing docs). Propose a complete draft: who Robin is for this team, voice (default: direct, concise, no hedging — overridable in review), the two universal conventions (cite your source; answer in the asker's language), plus team-specific conventions if evidence suggests any. Show it, revise on feedback, write it to the **TeamOS repo root as `soul.md`** (matching spec §4).
-2. **Propose a duty roster** — seeded from repo evidence: a meetings folder suggests meeting prep; metrics/data pointers suggest a morning brief; the digest is on by default (the spec's minimum roster). Present as a table — duty, trigger, inputs, output, destination, owner — and let the user prune/adjust in ONE confirmation. Write the declaration into the TeamOS repo (e.g., `robin/duties.md`).
+2. **Propose a duty roster** — seeded from repo evidence: a meetings folder suggests meeting prep; metrics/data pointers suggest a morning brief; a customer-signal source (support inbox, sales-call transcripts, CRM/chat) suggests a VoC synthesis (private-by-default per §6.3); the digest is on by default (the spec's minimum roster). Present as a table — duty, trigger, inputs, output, destination, owner — and let the user prune/adjust in ONE confirmation. Write the declaration into the TeamOS repo (e.g., `robin/duties.md`).
 
 ## Phase 4 — Emit Two Files (both to the TeamOS repo root)
 
