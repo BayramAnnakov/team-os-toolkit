@@ -23,6 +23,10 @@ Open Claude Code (or any agent that supports the skills standard) **in this fold
 
 A Robin without a knowledge repo is just a chatbot. Build the repo first (step 1), prove the value to one teammate (post the answer where they'll see it), and only then add enforcement (step 2), judgment (step 3), and the agent (step 4). Adoption follows demonstrated value, not announcement.
 
+## A target structure to grow into
+
+`/init-team-os` builds the *minimal* seed — folders after the answer, never empty scaffolds. [`template/`](template/) is the **map** of where that seed grows: the lean, proven shape generalized from the `onsa-brain` reference (`now.md`, a numbered `product/`, `decisions.md`, `skills/`, the frontmatter + folder-index conventions). It's a reference to grow *into*, not a scaffold to create up front — copy a file from it when real content demands it.
+
 ## Feedback
 
 Every question a skill asks that it could have mined, every ambiguity your coding agent hits in ROBIN-SPEC — those are bugs. Report them to @BayramAnnakov.
