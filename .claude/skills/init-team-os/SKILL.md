@@ -1,6 +1,6 @@
 ---
 name: init-team-os
-description: Evidence-first Team OS setup. Mines local Claude Code transcripts, MCP config, and existing repos to pre-populate a team knowledge repo interview, asks at most 5 questions, builds the minimal repo that answers the team's top recurring question, and ends with a ready-to-post demonstration message. Use when the user says "init team os", "set up our team os from evidence", "build our team knowledge repo", or wants a TeamOS scaffolded from what their machine already knows.
+description: Evidence-first Team OS setup. Mines the host agent's local transcripts (Claude Code, Codex, …), MCP config, and existing repos to pre-populate a team knowledge repo interview, asks at most 5 questions, builds the minimal repo that answers the team's top recurring question, and ends with a ready-to-post demonstration message. Use when the user says "init team os", "set up our team os from evidence", "build our team knowledge repo", or wants a TeamOS scaffolded from what their machine already knows.
 ---
 
 # /init-team-os — Evidence-First Team OS Setup
@@ -27,18 +27,22 @@ Mining is read-only. Local files never leave the machine; already-connected tool
 
 Sources, in value order:
 
-1. **Claude Code transcripts** — `~/.claude/projects/<slug>/*.jsonl`. Sample the most recent 30–60 days. Stream with `grep`/`jq`; never read whole files (they can be GBs). Extract two distinct signals:
+1. **The host agent's conversation history** — you are running INSIDE an agent; mine ITS session transcripts first (you know where you store your own). Sample the most recent 30–60 days, mtime-capped. Stream with `grep`/`jq`; never read whole files (they can be GBs). Locations by agent:
+   - **Claude Code:** `~/.claude/projects/<slug>/*.jsonl` (slugs begin with `-`; see Path safety).
+   - **Codex CLI:** `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl` (date-partitioned JSONL; `~/.codex/session_index.jsonl` indexes them by `thread_name`, and `~/.codex/history.jsonl` is the flat input history).
+   - **Cursor / other agents:** locate your own session store (Cursor keeps chats in its workspace DB). If you're an agent not listed here, you still know where your sessions live — find them before falling back to asking.
+   Extract two distinct signals, whatever the file schema:
    - Questions the user asked their agent repeatedly → knowledge the user lacks.
    - Context the user RE-EXPLAINED repeatedly (people, products, acronyms, decisions) → knowledge the repo should hold so nobody explains it again. **This is the higher-value signal.**
-   Also extract `mcp__<server>__<tool>` usage → the team's real tool inventory.
-2. **Claude config** — `~/.claude.json`, `~/.claude/settings.json`: `mcpServers`, `enabledPlugins` → connected tools (chat platforms, trackers, DBs, calendars).
+   Also extract tool/MCP usage (Claude Code: `mcp__<server>__<tool>`; Codex: the tool-call entries in its rollout JSONL) → the team's real tool inventory.
+2. **The host agent's config** — the MCP/tool config: Claude Code `~/.claude.json` + `~/.claude/settings.json` (`mcpServers`, `enabledPlugins`); Codex `~/.codex/config.toml` (`mcp_servers`). → connected tools (chat platforms, trackers, DBs, calendars). Redact credential-shaped values the moment they're read.
 3. **Connected read-only sources** — task trackers, meeting recorders, and wikis the config just revealed. A backlog IS team evidence: open/closed items reveal roster, roles, active projects, and vocabulary. (Field result: a "we have no knowledge base" team's Todoist held 137 tasks that yielded the roster and structure on the first query.) Name the source before querying; reads only.
 4. **Existing CLAUDE.md / AGENTS.md** across workspace repos → knowledge that already exists. Index it; never recreate it.
 5. **git history** of team repos → author names/emails (roster candidates), README (product description).
 6. **Calendar** (only if a calendar tool is already connected) → recurring meetings.
 7. **Drop-in files** the user provides: chat exports, meeting notes, a real artifact (transcript, strategy doc).
 
-If no transcripts exist (fresh machine, other-agent user): say so plainly, accept exported history if offered, and fall back to asking. Never fabricate evidence.
+If no transcripts exist after checking your own agent's store (a genuinely fresh machine): say so plainly, accept exported history if offered, and fall back to asking. Never fabricate evidence.
 
 ## Phase 1 — Evidence Review
 
