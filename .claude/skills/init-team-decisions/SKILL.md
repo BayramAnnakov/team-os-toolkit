@@ -136,6 +136,38 @@ trustworthy — same doctrine as watching the drift checker fail.
   file header — self-ratified principles become the team's through the calibration
   loop, not by decree. Honesty here is what makes the log trustworthy later.
 
+## Phase 6 — Enforce it (optional): the decision-guard hook
+
+The decisions layer is **advisory** until something makes the loop unskippable — the same
+step `/init-team-brain` takes with its drift-checker. Offer to generate a **Claude Code
+hook** that catches a decision made without the recommendation-first loop. **Enforcement
+must be seen firing before it is trusted** (same doctrine as watching the drift checker fail).
+
+Generate into the repo (`.claude/hooks/decision-guard.sh` + a `.claude/settings.json` snippet),
+carrying an `owner/tier/last_reviewed` comment header:
+
+- **Advisory (default — start here).** A `UserPromptSubmit` **command hook**: on a prompt that
+  asks to *make* a decision (choose/approve/commit/ship/merge/reject/prioritize · "should we" ·
+  "стоит ли" · "что лучше") but states **no recommendation**, print a nudge to stdout and
+  `exit 0` (the nudge is injected as context; the prompt still runs). Deterministic, offline,
+  free. Bilingual keyword match.
+- **Robust / enforced (the upgrade).** A `UserPromptSubmit` **prompt hook** (`type: "prompt"`,
+  a fast `model`, `$ARGUMENTS` = the hook JSON) that judges the same thing semantically and
+  returns `{"decision":"block","reason":"…run the loop / escalate one-way doors as a brief"}`
+  — no brittle regex. `type: "agent"` can even Read `decisions.md` to confirm a one-way door
+  was escalated. (Five handler types exist: command · http · mcp_tool · prompt · agent.)
+
+**Constraint progression — do NOT start enforced.** Ship advisory, watch false-positive rate,
+then upgrade to the prompt hook, then flip to `block`. Starting enforced punishes false
+positives and teaches people to resent the guard.
+
+**Watch it fire (the red demo — required before declaring it live):** submit a decision
+question with no recommendation → see the guard fire; submit the same with a recommendation
+committed → silence. Only then is enforcement trusted.
+
+> This is the W2→W4 bridge: the judgment layer (advisory) + a hook that enforces it =
+> constraint progression (Advisory → Enforced). Optional here; deepened when hooks are taught.
+
 ## Rules
 
 - No customer PII or account state in decisions.md — it records team judgment only.
