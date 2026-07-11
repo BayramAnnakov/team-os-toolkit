@@ -59,6 +59,15 @@ Extract candidates: the episode (dated, sourced), the generalized principle behi
 (**encode what transfers, keep the episode as the example** — a rule that only
 re-describes its own incident never fires again), and a scope.
 
+**Zero episodes found → do NOT fabricate and do NOT stall.** Roles, org charts, and
+aspirational docs are not episodes (no date, no visible reasoning on a specific call).
+Say exactly what the sweep lacked, then offer **interview mode**: elicit the last ~3
+real decisions one at a time (approximate date · the question · the call · the ACTUAL
+reasoning · how expensive to reverse), record each as a dated episode marked
+`source: recalled (unverified)`, and continue the normal flow. Recalled episodes are
+honest as long as they are labeled — invite the user to verify them against real
+exports later and upgrade the provenance.
+
 ## Phase 1 — Evidence Review
 
 Present candidate principles with provenance (episode, date, source, recurrence
