@@ -79,9 +79,12 @@ calibration authority is** (whose verdicts the log will be scored against).
 
 1. **Calibration authority** — confirm the mined candidate ("decisions seem to route
    to <X> — is <X> the judgment being encoded?").
-2. **One-way doors** — seed with the universal list (pricing & plan changes ·
+2. **One-way doors** — seed with a *starter* list (pricing & plan changes ·
    hiring/firing · commitments to customers · public statements · legal/contracts ·
-   spend beyond agreed budgets); the user edits. These ALWAYS escalate.
+   spend beyond agreed budgets); the user edits. **The test is reversibility-for-you,
+   not the topic** — some pricing calls are two-way (a small goodwill credit), some
+   "small" calls are one-way (a public API contract, a data-retention default). These
+   ALWAYS escalate.
 3. **Review cadence** — when does the authority review pending episodes and proposed
    principles? Default: attach to an existing weekly ritual, never a new meeting.
 
@@ -94,7 +97,10 @@ Into the team's knowledge repo:
   reasoning, scope, status `proposed`), and a **Decision log** section with the entry
   template (question · teammate recommendation + reasoning · skill lean with cited
   IDs + confidence · what was done · authority verdict: pending/agree/disagree).
-- **`skills/decide-like-<team>/SKILL.md`** — the apprentice loop:
+- **`.claude/skills/decide-like-<team>/SKILL.md`** — the apprentice loop. (Write it under
+  `.claude/skills/` — NOT a bare root `skills/` — so Claude Code auto-loads it and registers
+  `/decide-like-<team>` for any teammate who opens the repo. A root `skills/` folder is a
+  human-readable convention, not a discovery path.)
   0. *Classify*: on the one-way-doors list (or expensive to reverse, or
      precedent-setting) → output is an escalation brief; still run steps 1–2.
   1. *Force the recommendation*: (a) their call, (b) their reasoning and criteria,
@@ -105,19 +111,33 @@ Into the team's knowledge repo:
      precedents, confidence grounded in how many independent precedents support it.
      **No matching principle → say exactly that and route to the authority. A
      confident guess in their name is worse than a question.**
-  3. *Gap analysis on reasoning, not just conclusion*: match on both → say so;
-     same conclusion / different reasoning → flag it (right-for-the-wrong-reason
-     fails silently next time); different conclusion → name the principle that
-     produces the difference and what evidence would settle it. The human owns
-     the call.
+  3. *Surface the divergence — don't grade it*: this step compares reasoning to make
+     the gap **visible for the human to reconcile**, never to score the teammate.
+     Match on both → say so; same conclusion / different reasoning → surface it as an
+     open question ("your reasoning and D-07 diverge here — which of us is right?"),
+     because a right-answer-for-the-wrong-reason fails silently next time; different
+     conclusion → name the principle that produces the difference and what evidence
+     would settle it. The human owns the call; the skill never issues a verdict on
+     their thinking.
   4. *Log the episode* in decisions.md — no silent episodes; the log is what makes
      calibration possible.
-  5. *Calibration & graduation*: at the review cadence, the authority marks
-     agree/disagree (+why). Disagreements are the valuable ones — each fixes, adds,
-     or retires a principle. A teammate with **5 agreed verdicts of the last 6 in a
-     decision class** owns that class. (Deliberately N-of-last-M, not consecutive:
+  5. *Calibration & graduation — calibrated independence, NOT agreement*: at the
+     review cadence, the authority marks each logged episode. The signal is not "how
+     often did they echo me" — it is calibrated independence: can the authority
+     **predict** the teammate will land the call, AND does the teammate flag when
+     they'd diverge, with reasoning that holds up? A **well-reasoned disagreement that
+     fixes, adds, or retires a principle counts as a POSITIVE** graduation signal, not
+     a strike — it's the highest-value episode in the log (rewarding agreement-only
+     breeds yes-machines and, per the homogenization research, collapses the very
+     diversity that catches the authority's blind spots). Graduation applies **only to
+     reversible, convergent classes** (where consistency is the goal and a miss is
+     cheap); one-way doors, and classes where you WANT the teammate to out-think you,
+     never graduate this way. A teammate consistently calibrated over the **last 6
+     episodes** in such a class — right when they agree, right-or-principle-improving
+     when they disagree — owns that class. (N-of-last-M, not consecutive:
      consecutive-agreement taxes honest disagreement at exactly the moment voice
-     matters most.)
+     matters most. Run the loop **with** the teammate; the log is their track record to
+     earn autonomy, not a dossier on them.)
 
 ## Phase 4 — Prove It (the refusal test)
 
