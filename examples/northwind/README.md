@@ -34,6 +34,11 @@ From a Claude Code session in this repo:
   shows `/init-team-decisions` doing four distinct things: mine a clean principle, **reject** an
   un-mineable line, **escalate** a one-way door (the discount), and **refuse to crown** a call the
   room never committed to.
+- `team-os/` — the **built brain**: what `/init-team-os` + `/init-team-decisions` produce from the
+  evidence above (`CLAUDE.md`, `now.md`, `decisions.md`, `product/`). It's the "after" to everything
+  else here being the "before", and it's what the next skill in the chain reads. **If you're doing the
+  mining exercise, build your own first** — reading the answer key skips the part that teaches you
+  anything. Compare afterwards; disagreeing with it is a fine outcome.
 
 ## Who's who (roster)
 
