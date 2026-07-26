@@ -33,12 +33,25 @@ exactly like a clean one, so you will never find out.
 `Read`, `Bash`, `Grep`, `Glob`, `Write`, `Edit` and `WebFetch` all explicitly disallowed. Use it, or any
 equivalent with tools stripped. Make the isolation *structural*, not promised.
 
-**Verify it actually applied — don't assume.** After the run, check that each persona made **zero tool
-calls**. A persona that "didn't need to look anything up" and a persona that *couldn't* are
-indistinguishable in the output, and only one of them is evidence. If the agent type turned out to be
-unavailable and the personas ran in your own context, **say so in the report and label the whole run as
-weaker evidence** — a contaminated report looks exactly like a clean one, so nobody will catch this for
-you. Never run all the personas in one shared context and call it a panel.
+**Before dispatching a single real persona, prove the type exists** with a one-line throwaway call —
+*"reply with the word OK"*. Do this first, every time. **Agent definitions are loaded when a session
+starts and never re-scanned**, so if you have just `git pull`ed this file it is **not available in
+your current session, no matter what is on disk.**
+
+- **If it errors** (*"Agent type not found"* or similar) — **stop.** Do not quietly substitute
+  `general-purpose` and carry on; that is the exact moment this skill's only guarantee dies, and it
+  dies while everything still looks like it is working. The normal fix is: **fully restart Claude
+  Code, then re-run this skill from the top.** Only if a restart genuinely isn't possible, run the
+  personas in your own context and make the **first line** of your report, verbatim:
+  `⚠️ WEAKER EVIDENCE: no-tools-reviewer was unavailable; personas ran without filesystem isolation.`
+- **If it succeeds** — run the panel, then check each persona reports **zero tool calls.** A persona
+  that "didn't need to look anything up" and one that *couldn't* read identically otherwise, and only
+  one of them is evidence.
+
+**There is no plan B on a clean install.** "Use an equivalent with tools stripped" assumes a stripped
+agent lying around; on a fresh machine the only one that exists is the one this toolkit ships. Don't
+go looking for a substitute — restart, or declare weaker evidence. Never run all the personas in one
+shared context and call it a panel.
 
 ## Phase 0 · Find the team's brain
 
@@ -136,8 +149,11 @@ anything.** A tool-less sub-agent cannot open a browser, so you have two modes:
   before you rely on it; in many harnesses it does not.** *You* open the artifact, screenshot the
   relevant states, and pass the persona **the images plus the visible text**. This is what a user
   sees, so findings are directly comparable to a real session.
-- **Rendered-text (the realistic middle, and usually what you actually get).** If you cannot attach
-  images, open the artifact in a real browser, drive it, and extract the **rendered visible text** —
+- **Rendered-text (the realistic middle, and usually what you actually get) — needs working browser
+  automation, which is itself not a given.** A run of this in prep required a connected browser
+  extension *and* a local web server, because `file://` was blocked. If you don't have that, you are
+  in source-only mode below — **say so**, rather than drifting into it without noticing. If you do:
+  open the artifact in a real browser, drive it, and extract the **rendered visible text** —
   a page-text tool, *not* the raw HTML — then pass that. This is meaningfully stronger than
   source-only: no sample-data array, no CSS, no unclicked FAQ answers leak in. But **no persona can
   then see colour, layout, what is above the fold, or anything on a phone** — so any defect that
