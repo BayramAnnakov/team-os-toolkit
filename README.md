@@ -6,7 +6,13 @@ From the AI Natives build sessions (June 2026). Reference implementation running
 
 ## Quickstart
 
-Open Claude Code (or any agent that supports the skills standard) **in this folder** — the skills load automatically. Then, in order:
+Open Claude Code (or any agent that supports the skills standard) **in this folder** — the skills load
+automatically. Then, in order:
+
+> ⚠️ **Already cloned this before? `git pull` is not enough — quit Claude Code and start it again.**
+> Skills and agent types are read **once, when a session starts**, and are never re-scanned. Pull into a
+> running session and the new files sit on disk invisible to it: new skills won't be offered, and
+> `/synthetic-interviews` will fail with `Agent type 'no-tools-reviewer' not found`.
 
 | Step | Skill / Spec | What you get |
 |---|---|---|
