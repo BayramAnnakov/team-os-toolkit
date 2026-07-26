@@ -49,6 +49,28 @@ names, then one level up:
 
 Report the inventory in one line, then move.
 
+### Before anything else: is the packet the whole artifact?
+
+**The most expensive failure in this skill is not a wrong finding — it is a confident finding about
+something that simply wasn't in front of you.** A panel handed 4 of 9 screens will report, in good
+faith, that a feature is missing. It reasoned correctly; you gave it a hole.
+
+So, before the personas run, establish the boundary and **write it down**:
+
+- What screens/states *should* exist — from the spec, the route list, the Figma page, the story list?
+- Which of those are actually in the packet you're about to pass?
+- Anything absent: name it explicitly as **out of scope for this run**, and treat any finding that
+  amounts to "X is missing" as unresolved until you've checked X wasn't simply withheld.
+
+Then say it in the report, up front:
+
+> `Packet covers 4 of 9 known states (missing: Replied, Invite scheduled, Message scheduled).
+>  "Missing feature" findings below are bounded by this and may be packet artefacts.`
+
+This is stricter than the "say what nobody reached" rule later on, and it comes first: that rule
+assumes you know where the edges are. Here the edge itself is invisible — which is exactly why it
+has to be established before the run, by you, not discovered afterwards by an annoyed reviewer.
+
 **No brain?** Say so plainly — *"No personas found; I'm inventing three from the artifact itself,
 which makes every finding below weaker."* — and continue. Never stall.
 
@@ -70,6 +92,12 @@ WHAT THEY'D DO INSTEAD: <the manual workaround they'd fall back to>
 **One of the three must be hostile or in a hurry.** Panels default to agreeable users and agreeable
 users find nothing. If the brain's personas are all happy, say that out loud — it is itself a finding
 about the brain.
+
+**Vary the goal, not the costume.** Two personas with different names, ages and job titles who both
+want the same thing are one persona in two outfits, and they will produce one set of findings twice.
+Split on *what they came to do* — and if two real users in your brain have been merged into a single
+persona because they look alike, splitting them is itself a fix to the brain. (That has happened: a
+panel run surfaced two distinct users collapsed into one card in the team's own personas doc.)
 
 **And one must be on a *successful* path**, not a broken one. Coverage is a function of persona
 *goals*, not persona count: three people all chasing a stuck payment will all ignore the completed
@@ -160,6 +188,18 @@ independently is the strongest signal the instrument produces.
 **Say what nobody reached.** Every persona stops where they give up, which is honest and also means
 whole regions of the artifact were never touched. Name them: *"no persona got as far as the export
 flow, so this panel says nothing about it."* An unexplored area silently reads as a clean one.
+
+**Keep the finding and the fix in separate columns.** Reviewers will ask "so what should I do?" —
+and they should get an answer — but a direction is *your* judgment, while the finding is the
+panel's evidence. Blend them and a reviewer arguing with your suggested fix will throw out the
+observation underneath it. So:
+
+| Finding (what a persona hit, with its quote) | Direction (a suggestion, not evidence) |
+|---|---|
+
+**Group by screen, and put the callout on the pixel.** A list sorted by severity makes whoever has
+to fix it reassemble the map themselves. Annotate the screenshots directly, so the person looking at
+the design sees the finding on the thing it points at.
 
 Then, explicitly:
 
