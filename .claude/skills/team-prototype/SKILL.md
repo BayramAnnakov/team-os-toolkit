@@ -83,6 +83,10 @@ loop. Build the set in this order.
 out every rule that **constrains a user-facing artifact.** Convert each into something an
 independent evaluator can check, and **keep the source ID**.
 
+**Plenty of teams fold both into one file.** If there is no separate `principles.md`, that is normal
+and not a problem — mine `decisions.md` and move on. Do not go hunting, do not stop to ask, and do
+not tell the user their brain is incomplete because of it.
+
 The mining test: *would a person who has never read this file be able to violate it while building
 a screen?* If yes, it's a criterion.
 
@@ -142,7 +146,11 @@ object model, voice), and — from round 2 on — only the **latest** evaluation
 ```
 You are a PROTOTYPE GENERATOR. Build a working interactive prototype from the spec.
 
-Read: prototype-spec.md and the context files provided.
+Read: prototype-spec.md and the context files provided — and NOTHING ELSE.
+Do NOT open any file whose name suggests criteria, evaluation, rubric, scoring or
+review, even though you will see one sitting in this directory. Building to the rubric
+is the one thing that invalidates this run. If you notice such a file, say so and
+leave it closed.
 [Round 2+] Read the evaluation feedback and implement its top 2 fixes.
 [Round 2+] Also make ONE creative enhancement the evaluator did not ask for.
 
@@ -173,6 +181,15 @@ method, other iterations' code, or your orchestration notes.
 
 > Withholding the criteria is deliberate. A generator that is handed the rubric writes to the
 > rubric, and round 1 stops being an honest measurement of what your brain alone produces.
+
+> ⚠️ **"Never receives" describes what you PASS it — not what it can REACH.** The Generator runs
+> with file tools in the same working directory as `prototyping-criteria.md`. Nothing stops it
+> opening that file except the instruction above, which is why that instruction is inside the
+> prompt block rather than in this commentary. If your harness offers a sub-agent type with no
+> filesystem access, or you can run the Generator in a directory that does not contain the
+> criteria, prefer that — **structural isolation beats a polite request.** This was found by
+> running the skill, not by reading it: a Generator noticed the criteria file sitting next to it
+> mid-build and only left it closed because it had been told to.
 
 ## Phase 4 · EVALUATE (Evaluator sub-agent)
 

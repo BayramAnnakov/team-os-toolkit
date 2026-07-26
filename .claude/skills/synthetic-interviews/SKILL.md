@@ -28,10 +28,17 @@ sub-agent can *reach*. An agent with file tools can go read the spec, the brain,
 the previous persona's output, and a polite instruction won't stop it. A contaminated report looks
 exactly like a clean one, so you will never find out.
 
-**Use a sub-agent type with no filesystem access** — `no-tools-reviewer` where that exists, or any
-equivalent with tools stripped. Make the isolation *structural*, not promised. If no such agent type
-is available, say so in the report and label the whole run as weaker evidence. Never run all the
-personas in one shared context and call it a panel.
+**Use a sub-agent type with no filesystem access.** This toolkit ships one for exactly this purpose —
+**`no-tools-reviewer`**, defined in `.claude/agents/no-tools-reviewer.md` right next to this skill, with
+`Read`, `Bash`, `Grep`, `Glob`, `Write`, `Edit` and `WebFetch` all explicitly disallowed. Use it, or any
+equivalent with tools stripped. Make the isolation *structural*, not promised.
+
+**Verify it actually applied — don't assume.** After the run, check that each persona made **zero tool
+calls**. A persona that "didn't need to look anything up" and a persona that *couldn't* are
+indistinguishable in the output, and only one of them is evidence. If the agent type turned out to be
+unavailable and the personas ran in your own context, **say so in the report and label the whole run as
+weaker evidence** — a contaminated report looks exactly like a clean one, so nobody will catch this for
+you. Never run all the personas in one shared context and call it a panel.
 
 ## Phase 0 · Find the team's brain
 
@@ -58,6 +65,11 @@ faith, that a feature is missing. It reasoned correctly; you gave it a hole.
 So, before the personas run, establish the boundary and **write it down**:
 
 - What screens/states *should* exist — from the spec, the route list, the Figma page, the story list?
+  **If there is no spec, no route list and no passport at all — that is the gate failing, not the gate
+  being inapplicable.** Write "a scope document was expected here and none exists," and treat every
+  "X is missing" finding as doubly unresolved. The tempting move is to skip this section because
+  there is nothing to compare against; that is exactly when a panel invents boundaries and reports
+  them as observations.
 - Which of those are actually in the packet you're about to pass?
 - Anything absent: name it explicitly as **out of scope for this run**, and treat any finding that
   amounts to "X is missing" as unresolved until you've checked X wasn't simply withheld.
@@ -120,9 +132,18 @@ that confirms whatever you already believed — which is the exact failure this 
 **First decide what the persona actually receives — this determines whether the run is worth
 anything.** A tool-less sub-agent cannot open a browser, so you have two modes:
 
-- **Rendered (strong).** *You* open the artifact, screenshot the relevant states, and pass the
-  persona **the images plus the visible text**. This is what a user sees, so findings are directly
-  comparable to a real session. Prefer it whenever the artifact is a prototype.
+- **Rendered (strong) — *if* your sub-agent dispatch tool accepts image attachments. Check that
+  before you rely on it; in many harnesses it does not.** *You* open the artifact, screenshot the
+  relevant states, and pass the persona **the images plus the visible text**. This is what a user
+  sees, so findings are directly comparable to a real session.
+- **Rendered-text (the realistic middle, and usually what you actually get).** If you cannot attach
+  images, open the artifact in a real browser, drive it, and extract the **rendered visible text** —
+  a page-text tool, *not* the raw HTML — then pass that. This is meaningfully stronger than
+  source-only: no sample-data array, no CSS, no unclicked FAQ answers leak in. But **no persona can
+  then see colour, layout, what is above the fold, or anything on a phone** — so any defect that
+  lives in the pixels is invisible to the entire panel, and you must **say that in the report**
+  rather than quietly downgrading. Found the hard way: a run in this mode missed a completed item
+  rendered in the palette's *in-progress* colour — plainly visible on screen, unreachable from text.
 - **Source-only (weak, and you must say so).** You paste the HTML. The persona now **sees what no
   user sees** — the sample-data array, every FAQ answer without clicking, the CSS, the exact JS
   behind a bug — and **cannot see what every user sees**: layout, colour, what's above the fold,
