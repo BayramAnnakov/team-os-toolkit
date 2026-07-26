@@ -15,6 +15,12 @@ skills end-to-end when you don't have your own chats/meetings handy — it exerc
 That's the whole point: the repo answers the *words*; your recurring question was secretly
 asking for the *judgment*. Same raw evidence, two layers.
 
+Then a third layer **reads** those two rather than mining anything new:
+
+| Skill | Reads | What it needs from you |
+|---|---|---|
+| `/team-prototype` (W3) | the **built brain** in `team-os/` — and grades the prototype against that team's own `decisions.md`, citing principles by ID | one paragraph saying *what to build* — **ready for you in [`prototype-brief.md`](prototype-brief.md)** |
+
 ## How to use
 
 From a Claude Code session in this repo:
@@ -34,6 +40,9 @@ From a Claude Code session in this repo:
   shows `/init-team-decisions` doing four distinct things: mine a clean principle, **reject** an
   un-mineable line, **escalate** a one-way door (the discount), and **refuse to crown** a call the
   room never committed to.
+- `prototype-brief.md` — a ready-made **feature brief** for `/team-prototype` (W3), so you can run the
+  prototyping layer without having to invent a feature first. It's Northwind's real current focus per
+  `team-os/now.md`, and the brain has a deliberate trap waiting in it for the evaluator to catch.
 - `team-os/` — the **built brain**: what `/init-team-os` + `/init-team-decisions` produce from the
   evidence above (`CLAUDE.md`, `now.md`, `decisions.md`, `product/`). It's the "after" to everything
   else here being the "before", and it's what the next skill in the chain reads. **If you're doing the
