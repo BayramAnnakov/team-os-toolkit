@@ -39,6 +39,12 @@ Want to see a finished one? [`examples/northwind/`](examples/northwind/) holds a
 
 `/init-team-os` builds the *minimal* seed — folders after the answer, never empty scaffolds. [`template/`](template/) is the **map** of where that seed grows: the lean, proven shape generalized from the `onsa-brain` reference (`now.md`, a numbered `product/`, `decisions.md`, `skills/`, the frontmatter + folder-index conventions). It's a reference to grow *into*, not a scaffold to create up front — copy a file from it when real content demands it.
 
+## Exercises
+
+Workshop sheets live in [`exercises/`](exercises/) — start with
+[`w4/exercise-1-hooks.md`](exercises/w4/exercise-1-hooks.md), which turns a ratified decision into a
+hook that blocks, and ships a working guard next to it.
+
 ## Feedback
 
 Every question a skill asks that it could have mined, every ambiguity your coding agent hits in ROBIN-SPEC — those are bugs. Report them to @BayramAnnakov.
