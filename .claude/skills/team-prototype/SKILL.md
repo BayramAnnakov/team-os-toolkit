@@ -1,6 +1,6 @@
 ---
 name: team-prototype
-description: "The prototyping layer of a Team OS. Turns a feature description into a working, publishable prototype, then autonomously improves it across independent Generator-Evaluator rounds — grading it against YOUR team's own glossary, personas and decision principles, not generic taste. Use when someone wants to prototype a feature, turn a spec into a clickable thing, get a live URL for a stakeholder, or test whether their team brain is good enough to build from."
+description: "The prototyping layer of a Team OS. Turns a feature description into a working, publishable prototype, then autonomously improves it across independent Generator-Evaluator rounds — grading it against YOUR team's own glossary, personas and decision principles, not generic taste. It triages first — deciding how many rounds the artifact is actually worth before spending them, because the loop is not free. Use when someone wants to prototype a feature, turn a spec into a clickable thing, get a live URL for a stakeholder, or test whether their team brain is good enough to build from."
 effort: high
 ---
 
@@ -69,6 +69,74 @@ just has a lower ceiling. Never stop to ask for a brain that doesn't exist.
 **Stale check.** If `now.md` or a `last_reviewed` is more than a month old, note it once and treat
 specifics as possibly stale. Don't refuse to build.
 
+## Phase 0.5 · TRIAGE — how much loop is this worth?
+
+**The loop is expensive.** Three rounds is six sub-agent runs plus a browser-verification pass
+each, and you pay for all of it. Running three rounds on a small question is waste, and saying so
+out loud is part of the job — not a failure to be thorough.
+
+Decide the depth **here**, before Phase 3 spends anything.
+
+**Check this override FIRST — it beats both axes below, whatever the size:** anything going in
+front of a client or external stakeholder, anything that will be used to make a decision, and
+anything the user asked to publish is **`full`**. A one-screen artifact that a board will fund
+against is still `full`. Read this before you reason about size, or you will talk yourself into
+`one-shot` on the strength of axis 1 and never reach this line.
+
+Otherwise, two axes, in this order:
+
+**1 · How composite is the artifact?** Does producing it take dozens of distinct steps — several
+screens, entity states pulled from the object model, data cross-checked between sources — or is
+it one screen answering one question? The harness earns its cost on the first. It does not on the
+second.
+
+**2 · What does being wrong cost, and can you take it back?** Something a stakeholder will act on
+is worth the rounds. A sketch that gets thrown away this afternoon is not.
+
+**"The room" means you and whoever is in this working session.** A teammate you send it to for a
+look is *outside* the room — that is `single-round`, not `one-shot`. And "throwaway" is about
+whether you would happily rebuild it, not about whether the file gets committed: a 404 page living
+in a repo forever is still throwaway if redoing it costs nothing.
+
+| Depth | When | What actually runs |
+|---|---|---|
+| `one-shot` | one screen, one question, throwaway, nobody outside the room sees it | Phases 1-3, then stop. Generator builds once. **No evaluation** — and you say so. |
+| `single-round` | small and reversible, but someone else will look at it | Phases 1-4, then **one** Generator fix pass. One independent evaluation, then stop. |
+| `full` | composite, **or** expensive / hard to reverse if wrong — **the default** | Phases 1-5 as written, 3-5 rounds. |
+
+**When in doubt, choose `full`.** Under-running produces an artifact nobody checked; over-running
+costs tokens. Only the first one reaches a stakeholder.
+
+**The user outranks this — but only when they actually named a depth.** Keep these two apart:
+
+- **They named the depth** (*"3 rounds"*, *"one round is enough"*, *"don't bother evaluating"*) →
+  honor it exactly, even if it doesn't match a row in the table, and skip the rest of this phase.
+  *"3 rounds"* means three, not "`full`, which allows up to five."
+- **They only said don't bother them** (*"just run it"*, *"don't ask me"*, dispatched and left) →
+  that is an instruction about *questions*, not about *depth*. **Still triage.** Decide silently,
+  state the verdict in your first line of output, and proceed. This is the common case — most runs
+  of this skill are dispatched — so a rule that skipped triage here would never fire at all.
+
+State the verdict in one line, write it into `prototype-spec.md`, and keep moving:
+
+> `Triage: full — 3 screens with states from the object model, and it goes to a client Thursday. 3 rounds.`
+>
+> `Triage: one-shot — single screen, one question, internal sketch. Building once, no evaluation loop.`
+
+⚠️ **On `one-shot`, do not grade your own output.** The Orchestrator never evaluates — that rule
+is what makes every score in this skill mean anything (Design principle 1). Hand the artifact back
+labelled honestly:
+
+> *"Built once, triaged as one-shot — **this has not been evaluated by anything**. Say the word and
+> I'll run a round against the criteria."*
+
+An unevaluated artifact you were told is unevaluated is fine. An unevaluated artifact wearing a
+score it gave itself is the exact failure this skill exists to prevent.
+
+> **Why this lives in the skill and not in your head:** for an agent that runs on its own, triage
+> has to be written into the procedure or it never happens — by the time a human thinks to ask
+> *"is this worth three rounds?"*, the expensive path has already started.
+
 ## Phase 1 · CRITERIA — derive them from the brain
 
 Evaluation criteria decide what "better" means, so they are the highest-leverage thing in the
@@ -132,6 +200,7 @@ Write `prototyping-criteria.md` — each criterion with its source (`D-01` / `gl
 Write a **one-page** `prototype-spec.md`:
 - What this is (type, scope) and the **question it answers** — if you can't state what it tests or
   demonstrates, it's decoration, not discovery
+- **Depth** — the Phase 0.5 verdict and the one-line reason for it, so a reader knows what they got
 - Who sees it — **named from the brain's personas** where they exist, with their actual goal
 - Core screens (2-3 max) and key interactions (5 max)
 - **Vocabulary** — the exact glossary terms this must use, quoted from the brain
@@ -246,10 +315,17 @@ Round N:
   7. PASS → Phase 6.  FAIL → round N+1.
 ```
 
-- Minimum **3** rounds — the round-3 creative enhancement often produces the biggest leap
+**This phase runs at `full` depth.** At `single-round` you stop after one Generator fix pass; at
+`one-shot` you never enter it at all (Phase 0.5).
+
+- At `full`: minimum **3** rounds — the round-3 creative enhancement often produces the biggest leap
 - Maximum **5** — quality plateaus; stop when scores stop moving
 - Any criterion below 4 after round 2 → a focused round on that criterion alone
 - **Communication is via files only.** No context leaks between Generator and Evaluator.
+
+⚠️ **Do not loop until the score is perfect.** Three rounds catches the things that matter; after
+that you are paying tokens to chase a number, and the person who should be looking at it is you.
+A "run until it scores 10" hook is a way of never having to read your own artifact.
 
 ## Phase 6 · PUBLISH
 
@@ -311,6 +387,7 @@ path plus the one-line reason each failed.
 ## Output summary
 
 Report:
+- **The depth you triaged to, and why** — and at `one-shot`, say plainly that nothing evaluated it
 - **R1 → final score** (e.g. `4.1 → 7.6`), and which criteria moved
 - What the brain contributed — and, honestly, what it was missing
 - Any principle the Evaluator caught being violated, with its ID
@@ -334,3 +411,6 @@ Report:
 7. **The loop has a ceiling.** It converges on the criteria you gave it. It cannot tell you whether
    anyone wants this — that still takes a person.
 8. **Every prototype answers a question.** If you can't say what it tests, it's decoration.
+9. **Triage before you spend.** The loop costs real money and real wall clock. Match the depth to
+   how composite the artifact is and what being wrong would cost — and be willing to say "this
+   one doesn't need the machinery."
