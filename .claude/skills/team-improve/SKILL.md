@@ -121,10 +121,13 @@ Then require two cases the mining could not have produced:
 production loop sat inert for 53 days while the same defect recurred. Run the cases:
 
 ```bash
-python3 scripts/run_cases.py improve/cases \
+# from the team-os-toolkit root
+python3 .claude/skills/team-improve/scripts/run_cases.py improve/cases \
   --agent  '<the agent under test>' \
   --grader '<a DIFFERENT vendor>'
 ```
+
+If `improve/cases` lives elsewhere, pass its real path — the script takes it as an argument.
 
 Three rules the runner enforces, and you must not work around:
 
