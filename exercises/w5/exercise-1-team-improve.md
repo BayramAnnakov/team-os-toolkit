@@ -4,8 +4,20 @@
 
 ## You pass when you have
 
-**A scored run.** Three cases, criteria **you** wrote, run against your agent, graded by a
-**different** model than the one that proposed them — and a results file with a number in it.
+**A scored run.** Exactly **three cases**, criteria **you** wrote, graded by someone other
+than the agent that proposed them — and a result with a number in it.
+
+The three, so there is no ambiguity:
+
+1. **one from the mining** — the agent proposes it, you write the criteria
+2. **one refusal** — something your agent must decline
+3. **one the agent never proposed** — you add it
+
+The agent will offer you more than three. **Prune to three.** More cases is not a better run;
+three you actually scored beats eight you did not.
+
+**"Graded by someone else" has two valid forms** — a different vendor's model, *or a person*.
+A human grader is more independent than any model, not less. Tier 3 passes on the same bar.
 
 Staged notes are not learning. A number nobody else produced is the deliverable.
 
@@ -22,11 +34,26 @@ Staged notes are not learning. A number nobody else produced is the deliverable.
 
 **Bank, fintech, regulated → Tier 2.** You lose nothing that is graded.
 
+> ### ⚠️ Tier 2, read this before Step 3
+> The sample logs are a fictional company. **Mine them to learn the technique — then write
+> your cases about YOUR OWN work.** If you score a question about the sample company against
+> your real agent, it will answer from whatever context it does have, and you will grade an
+> answer about the wrong company.
+>
+> That happened in testing, and the criteria **passed it anyway**. Which is the lesson:
+> **a criterion a wrong answer can satisfy is not a criterion.** If yours could be met by an
+> answer about someone else's company, tighten it — name the system, the table, the team.
+
 > **Be precise about what leaves the machine.** Steps 1–2 are fully local: the extractor and
 > your candidate file never leave your disk. **Step 3 is not local** — scoring sends the
 > *question* and the *agent's answer* to two model vendors. It does not send your logs. If even
-> that is not allowed, use `--agent none` and have a **person** grade it. That is a legitimate
-> run, and on some teams it is the better one.
+> that is not allowed, use `--agent none --grader none`: you paste the answer, and a **person**
+> grades it. Nothing leaves the machine at all. That is a legitimate run, and on some teams it
+> is the better one.
+>
+> **Be aware of what the grader sees.** It receives the agent's full answer — and if your agent
+> pulled real internal data to answer, that content goes to the grading vendor. If that matters,
+> `--grader none`.
 
 ---
 
@@ -193,10 +220,13 @@ and the run. A perfect cluster list with nothing scored is the failure this sess
 
 ## Fast finishers
 
-1. **Run the same cases twice.** Different results? Then one run was never evidence. Use
-   `pass^k`, not `pass@k`, for anything that must work every time.
-2. **Grade once more with a third vendor.** Where graders disagree is where your criteria
-   are vague — not where the models are.
+1. **Run the same cases twice.** Different results mean one run is *weak* evidence, not that
+   it is worthless — and two runs still do not measure reliability properly. For anything that
+   must work every time, the metric you want is `pass^k` (all runs succeed), not `pass@k`
+   (at least one does).
+2. **Grade once more with a third vendor.** Disagreement is a signal to inspect, not a
+   verdict: it can mean your criterion is vague, *or* that one grader is simply wrong. Read
+   the reasons before you conclude which.
 3. **Retire something.** Find one rule in `decisions.md` or `CLAUDE.md` that has gone stale.
    Deleting a wrong rule beats adding a right one.
 
@@ -222,5 +252,6 @@ Point the extractor at that file. Full notes: `.claude/skills/team-improve/refer
    contain.** Those are your criteria.
 3. Add one thing it must **refuse**.
 4. Ask the person next to you to be the grader. Read them your criteria, read them the
-   agent's last answer, let *them* score it. That is the whole point, done with a human.
-5. Post the counts in chat.
+   agent's last answer, let *them* score it. **This is a full pass, not a consolation** — an
+   independent human is the strongest grader on the list.
+5. Post the counts in chat: `scored: 3 cases, C/S criteria met · grader: <name>`.

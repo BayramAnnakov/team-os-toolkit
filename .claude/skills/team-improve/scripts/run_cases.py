@@ -14,9 +14,12 @@ Two rules it enforces, and will not be talked out of:
 1. **A case with no `expected_signals` is not scored.** It is reported as
    UNGRADED. The human writes the criteria; that is the whole point, and a run
    that quietly grades against nothing is worse than no run.
-2. **The grader should not be the same model as the agent under test.** Judges
-   measurably prefer their own family's output (Panickssery et al., 2024), so a
-   same-model grade is not independent. The script warns when they match.
+2. **The grader should not be the same model as the agent under test.** Evaluators
+   measurably prefer *their own generations* (Panickssery, Bowman & Feng, 2024 —
+   arXiv:2404.13076); related work reports the effect leaking across models of the
+   same family. Either way, a same-model grade is not independent evidence. The
+   script warns when they match. `--grader none` hands grading to a person, which
+   is the most independent option available.
 
 Offline: `--agent none` prompts you to paste the answer. Works with no API at all.
 """
@@ -103,6 +106,30 @@ Reply with ONLY a JSON object, no prose, no code fence:
 "why": "<max 15 words>"}}], "notes": "<max 25 words, or empty>"}}"""
 
 
+def grade_by_human(case: dict, answer: str) -> dict:
+    """A person grades, one criterion at a time. This is not a degraded mode.
+
+    A human grader is more independent than any model, and it is the only path
+    that works with no second vendor, on a locked laptop, or when the answer
+    must not leave the room.
+    """
+    print("\n   ── HUMAN GRADING ──")
+    print(f"   Q: {case['question'][:300]}")
+    print(f"\n   ANSWER:\n   {answer[:1200]}")
+    sigs = []
+    for s in case["expected_signals"]:
+        while True:
+            print(f"\n   Criterion: {s}")
+            v = input("   met? [y/n] ").strip().lower()
+            if v in ("y", "yes", "n", "no"):
+                break
+        why = ""
+        if v.startswith("n"):
+            why = input("   why not (few words): ").strip()
+        sigs.append({"signal": s, "met": v.startswith("y"), "why": why})
+    return {"signals": sigs, "notes": "graded by a human"}
+
+
 def grade(case: dict, answer: str, grader: str, timeout: int) -> dict:
     sig = "\n".join(f"- {s}" for s in case["expected_signals"])
     prompt = GRADE_PROMPT.format(q=case["question"], a=answer[:6000], s=sig)
@@ -124,12 +151,16 @@ def main() -> int:
     ap.add_argument("--agent", default="claude -p {q}",
                     help="command under test; 'none' to paste answers by hand")
     ap.add_argument("--grader", default="codex exec -s read-only --skip-git-repo-check {q}",
-                    help="grader command — use a DIFFERENT vendor than --agent")
+                    help="grader command — use a DIFFERENT vendor than --agent; "
+                         "'none' means a PERSON grades, which is the most independent option")
     ap.add_argument("--out", default=None, help="results markdown (default: <cases_dir>/../results/)")
     ap.add_argument("--timeout", type=int, default=180)
     a = ap.parse_args()
 
-    paths = sorted(glob.glob(os.path.join(a.cases_dir, "*.md")))
+    if os.path.isfile(a.cases_dir):
+        paths = [a.cases_dir]          # a single case file is a legitimate run
+    else:
+        paths = sorted(glob.glob(os.path.join(a.cases_dir, "*.md")))
     if not paths:
         print(f"No cases in {a.cases_dir}. Write some first (/team-improve Phase 4).")
         return 2
@@ -141,7 +172,8 @@ def main() -> int:
                 return v
         return "unknown"
 
-    if a.agent != "none" and vendor(a.agent) == vendor(a.grader) != "unknown":
+    if (a.agent != "none" and a.grader != "none"
+            and vendor(a.agent) == vendor(a.grader) != "unknown"):
         print(f"\n  ⚠  agent and grader are both '{vendor(a.agent)}'. A judge prefers its own")
         print("     family's output — this grade is not independent. Continuing anyway.\n")
 
@@ -178,7 +210,8 @@ def main() -> int:
                 print(f"   AGENT FAILED: {answer[:160]}")
                 errors.append((c["id"], "agent", answer[:200]))
                 continue
-        res = grade(c, answer, a.grader, a.timeout)
+        res = (grade_by_human(c, answer) if a.grader == "none"
+               else grade(c, answer, a.grader, a.timeout))
         if "error" in res:
             print(f"   GRADER FAILED: {res['error'][:160]}")
             errors.append((c["id"], "grader", res["error"][:200]))
@@ -206,8 +239,8 @@ def main() -> int:
     print(f"  agent  : {a.agent}")
     print(f"  grader : {a.grader}")
     print("=" * 58)
-    print("  Compare FINDINGS across runs, not the score. Scores do not replicate;")
-    print("  a criterion that fails twice for the same reason does.")
+    print("  Read the FINDINGS before the score. A single total moves with grader")
+    print("  variance; a criterion that fails twice for the same reason is a result.")
 
     outdir = a.out or os.path.join(os.path.dirname(os.path.abspath(a.cases_dir)), "results")
     os.makedirs(outdir, exist_ok=True)

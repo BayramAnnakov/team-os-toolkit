@@ -17,7 +17,8 @@ the result is the defendant, the witness and the judge.
 ## Preconditions
 
 1. **Traces.** A directory of session logs. Any of:
-   - `~/.claude/projects/` — Claude Code sessions. Everyone who uses the CLI has these.
+   - `~/.claude/projects/` — Claude Code sessions. Present by default, but logging can be
+     disabled, redirected or cleaned; check before promising a participant they have them.
    - an export from a deployed agent (see `references/trace-formats.md` for the generic shape)
    - `examples/sample-traces/` in this toolkit — for anyone with neither
 2. **A Team OS repo** to write into. If none, say so and offer `/init-team-os` first —
@@ -138,8 +139,9 @@ Three rules the runner enforces, and you must not work around:
 3. **A tool failure is not a score of zero.** An agent that could not be reached and an
    agent that answered wrongly are different events. Never let one be reported as the other.
 
-No second vendor available? `--agent none` lets a human paste the answer, and a person can
-be the grader. That is a *better* run than a same-model one, not a worse one.
+No second vendor available? **`--agent none --grader none`** — a person pastes the answer and
+a person grades it, criterion by criterion. Nothing leaves the machine. That is a *better* run
+than a same-model one, not a worse one.
 
 ## Phase 6 — Report and hand over
 
@@ -151,8 +153,10 @@ Close with the three conditions a change must meet before it becomes permanent b
 **a named human · a versioned diff · a number on a frozen set the proposing agent did not
 score.** Name which of the three the team does not yet have.
 
-Report findings, not just the score. **Scores do not replicate; findings do.** A criterion
-that fails twice for the same reason is a result. A total that moved by one point is noise.
+Report findings, not just the score. **Read the findings before the total.** A criterion that
+fails twice for the same reason is a result; a total that moved by one point is within grader
+variance. Neither is automatic — a finding can fail to replicate too, and a score *is*
+reproducible if you hold the model, the prompt and the case set fixed. Say which you did.
 
 ## Rules
 
