@@ -1,0 +1,166 @@
+---
+name: team-improve
+description: Build the self-improvement loop for an agent your team already runs. Mines its session traces for the places a person corrected it, clusters them into staged improvement candidates, and derives a frozen test set from those episodes — where the agent proposes the case and the human writes the pass criteria. Use when the user says "team improve", "mine my agent's logs", "what should my agent learn", "build evals for my agent", "why does my agent keep making the same mistake", or wants a self-improvement loop that does not let the agent grade itself.
+---
+
+# /team-improve — the loop, with the evidence the agent does not control
+
+Your team has written down what it knows: a brain, `decisions.md`, a critic, a hook. All of
+that teaches the agent what you **already** know. This skill builds the part that learns
+what you **don't** — from the agent's own operation — and it deliberately withholds one
+thing from the agent: the criteria it will be judged by.
+
+**The rule this whole skill exists to enforce:** *the agent brings the case; the human
+writes the criterion.* An agent that proposes a change, selects the evidence, and grades
+the result is the defendant, the witness and the judge.
+
+## Preconditions
+
+1. **Traces.** A directory of session logs. Any of:
+   - `~/.claude/projects/` — Claude Code sessions. Everyone who uses the CLI has these.
+   - an export from a deployed agent (see `references/trace-formats.md` for the generic shape)
+   - `examples/sample-traces/` in this toolkit — for anyone with neither
+2. **A Team OS repo** to write into. If none, say so and offer `/init-team-os` first —
+   candidates and cases must live somewhere versioned, or this is a one-off report.
+3. `decisions.md` is **optional but load-bearing when present**: an improvement candidate
+   that contradicts a ratified principle must be flagged, never silently staged.
+
+## Phase 1 — Extract, mechanically
+
+Run `scripts/extract_candidates.py` against the traces directory. Do **not** read raw logs
+into context: a normal machine holds ~190,000 lines per 800 sessions, of which ~1% can
+possibly be a correction.
+
+The script keeps only human-typed turns that directly follow an agent reply, and drops tool
+results, scheduled prompts, skill preambles, compact summaries and inter-agent messages.
+Report its counts to the user before going on — the funnel is itself the first lesson.
+
+## Phase 2 — Judge, semantically
+
+Read each candidate as a pair: what the agent said, then what the person said back. Decide
+whether the person was **correcting the agent's output**, and if so, which kind.
+
+**Do not look for negation words.** Measured on real logs: a keyword pass is ~80% false
+positives, and real corrections from senior people are polite and indirect. The highest-value
+correction in one production store was *«А почему trace id не прикрепил?))»* — a question,
+with a smiley, containing no negation at all. If your method would score that zero, your
+method is wrong.
+
+Classify each true correction:
+
+| Class | Looks like | Rule-shaped? |
+|---|---|---|
+| Factual challenge | *"could you double-check that?"* | sometimes |
+| Misread intent | *"I meant …"* | rarely |
+| Overstatement | *"that overstates it"* | sometimes |
+| Judgment disagreement | *"I don't think that's a big point"* | rarely |
+| **Prohibition / instruction** | *"never do X"*, *"remember that prices are in cents"* | **usually** |
+| Scope removal | *"drop that section"* | rarely |
+
+Report precision honestly: how many candidates you read, how many were corrections.
+
+## Phase 3 — Cluster and stage
+
+Group corrections by **root cause**, not by wording. Two differently-worded complaints about
+the same defect are one cluster.
+
+For each cluster write one file to `improve/candidates/YYYY-MM-DD-<slug>.md`:
+
+- what the agent did, what the person said (quote them, dated)
+- the proposed change, in one or two sentences
+- **when to apply it** — the part that makes it transfer beyond its own episode
+- how many independent episodes support it
+
+Then **cut**. A skill that stages everything is a junk drawer; one that knows what *not* to
+record is the product. Reject anything overfit to a single incident, anything that merely
+re-describes what happened, and anything that restates a rule the team already has. Show the
+rejected list with reasons — the cut is as instructive as the keep.
+
+**Never change active behaviour.** No edits to `CLAUDE.md`, `decisions.md`, skills, hooks or
+prompts. Staging only. Promotion is a human action, and it is a separate one.
+
+## Phase 4 — Derive the test set (the point of the skill)
+
+For each surviving cluster, propose a **case** — the input that would reproduce the failure.
+Write to `improve/cases/NN_<slug>.md`, mirroring the frozen-suite shape:
+
+```markdown
+---
+id: 03_trace_id_copyable
+description: Asked for trace ids; the raw id must be copyable, not hidden behind a link label
+expected_signals:      # ← THE HUMAN WRITES THESE
+  - <written by the human>
+is_ephemeral: true     # true when the correct answer changes over time
+notes: <why, if ephemeral>
+---
+
+<the question, as a person would really ask it>
+```
+
+**Two hard rules.**
+
+1. **The human writes `expected_signals`.** Leave the list empty and ask. You may transcribe
+   a signal only when you can **quote a person in the trace saying it** — and then show the
+   quote next to it. If you cannot point at a human utterance, do not propose the signal.
+2. **Assert signals, never answers.** *"Returns a number, filters internal accounts, cites
+   the source"* survives next week. *"Returns 751"* does not. Set `is_ephemeral: true` and
+   say why in `notes`.
+
+Then require two cases the mining could not have produced:
+
+- **One negative case.** Something the agent must *decline* — say "not in the repo", ask for
+  clarification, refuse to invent. A suite of only positive cases cannot tell a helpful agent
+  from a confabulating one. This is the "it fires AND it stays silent" bar, applied to evals.
+- **One case you did not propose.** The person adds it from their own recurring questions.
+  You selected which failures they saw; that selection carries your blind spot, and this is
+  the only step that can catch it.
+
+## Phase 5 — Score it, or nothing was learned
+
+**Staging is not learning.** A candidate that never gets measured is exactly how a real
+production loop sat inert for 53 days while the same defect recurred. Run the cases:
+
+```bash
+python3 scripts/run_cases.py improve/cases \
+  --agent  '<the agent under test>' \
+  --grader '<a DIFFERENT vendor>'
+```
+
+Three rules the runner enforces, and you must not work around:
+
+1. **A case with empty `expected_signals` is UNGRADED, not passed.** The human writes the
+   criteria. A run that grades against nothing is worse than no run.
+2. **The grader must be a different model from the agent under test.** Judges measurably
+   prefer their own family's output, so a same-model grade is not independent evidence.
+3. **A tool failure is not a score of zero.** An agent that could not be reached and an
+   agent that answered wrongly are different events. Never let one be reported as the other.
+
+No second vendor available? `--agent none` lets a human paste the answer, and a person can
+be the grader. That is a *better* run than a same-model one, not a worse one.
+
+## Phase 6 — Report and hand over
+
+Write `improve/REPORT.md`: the funnel counts, precision, clusters kept and cut with reasons,
+cases written, **the scored result**, and — explicitly — **what this pass could not see**
+(see `references/trace-formats.md` → *Known limits*).
+
+Close with the three conditions a change must meet before it becomes permanent behaviour:
+**a named human · a versioned diff · a number on a frozen set the proposing agent did not
+score.** Name which of the three the team does not yet have.
+
+Report findings, not just the score. **Scores do not replicate; findings do.** A criterion
+that fails twice for the same reason is a result. A total that moved by one point is noise.
+
+## Rules
+
+- Question budget: at most 5, and the `expected_signals` conversation does not count — that
+  is the deliverable, not overhead.
+- Never promote. Never edit active behaviour. Staging and cases only.
+- Show every file's substance before writing it.
+- **Verify every write by reading it back**, and say so. Silent write failures are the
+  documented way this class of loop dies: a store reports success, the file never exists,
+  and the correction is lost for months while everyone believes it was saved.
+- Quote people verbatim and date every episode. No episode → no candidate.
+- If a candidate contradicts a ratified principle in `decisions.md`, flag it and stop. That
+  is an escalation for a human, not a staging decision.
+- Report precision as a fraction, never as an adjective.
