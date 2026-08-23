@@ -47,6 +47,11 @@ MACHINE_PREFIX = re.compile(
     r"|Base directory for this skill:"
     r"|Caveat:"
     r"|This session is being continued from a previous conversation"
+    # Codex orchestration wrappers. Measured on 200 real Codex sessions: only
+    # 30 of 375 surviving turns were a person — the rest were these.
+    r"|<realtime_delegation"
+    r"|<codex_delegation"
+    r"|The following is the Codex agent history"
     r")",
     re.I,
 )
@@ -78,6 +83,30 @@ def _is_pure_tool_result(content) -> bool:
 
 def classify(rec: dict) -> tuple[str, str | None]:
     """-> (role, text). role in {human, assistant, machine, skip}."""
+    # --- Codex rollout shape (~/.codex/sessions/**/rollout-*.jsonl) ---
+    # Codex writes each turn TWICE: once as an `event_msg` (what actually passed
+    # between the person and the agent) and once as a `response_item` (the
+    # assembled API payload, which also carries injected AGENTS.md instructions).
+    # `event_msg` is Codex's equivalent of Claude Code's promptSource:typed —
+    # measured on a real session, 100 user_message events vs 106 response_item
+    # user turns, and the 6 extra are injected instructions nobody typed.
+    if rec.get("type") in ("event_msg", "response_item", "turn_context",
+                           "session_meta", "compacted"):
+        if rec.get("type") != "event_msg":
+            return "skip", None            # API-level duplicate or machinery
+        pl = rec.get("payload") or {}
+        kind = pl.get("type")
+        if kind == "user_message":
+            msg = pl.get("message")
+            if not msg or not msg.strip():
+                return "skip", None
+            # Same Layer-2 check as every other format: orchestration wrappers
+            # arrive as user_message and nobody typed them.
+            return ("machine" if MACHINE_PREFIX.match(msg) else "human"), msg
+        if kind == "agent_message":
+            return "assistant", pl.get("message")
+        return "skip", None                # reasoning, token_count, aborts…
+
     # --- generic fallback shape ---
     if "role" in rec and "type" not in rec:
         role = rec.get("role")

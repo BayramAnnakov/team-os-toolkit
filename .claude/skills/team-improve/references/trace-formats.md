@@ -64,3 +64,24 @@ Emit as JSONL, one row per line.
 - **Sub-agent traffic.** `isSidechain` turns are not special-cased yet.
 - **PII.** `candidates.jsonl` contains verbatim text from your logs. It is working material.
   Do not commit it to a shared repo without redacting it first.
+
+## 3. Codex rollout logs (auto-detected)
+
+`~/.codex/sessions/**/rollout-*.jsonl`. Codex writes each turn **twice**:
+
+| Line | What it is | Used? |
+|---|---|---|
+| `event_msg` / `user_message` | what the person actually typed | ✅ **this one** |
+| `response_item` / `message` role=user | the assembled API turn — **includes injected AGENTS.md** | ❌ dropped |
+| `event_msg` / `agent_message` | what the agent replied | ✅ |
+| `reasoning`, `token_count`, `function_call*`, `turn_context` | machinery | ❌ |
+
+`event_msg` is Codex's equivalent of Claude Code's `promptSource: typed`.
+
+**Measured on 200 real sessions:** 584 human-typed turns, of which **395 were orchestration
+wrappers** — `<realtime_delegation>`, `<codex_delegation>`, and a supervisor loop beginning
+*"The following is the Codex agent history…"*. Only 31 survived as correction-eligible.
+If you drive Codex from scripts, expect most of your log to be your own automation.
+
+⚠️ `~/.codex/history.jsonl` is **human prompts only** — no agent turns, so nothing can be
+paired. Point the extractor at `sessions/`, not at `history.jsonl`.
