@@ -58,6 +58,29 @@ Classify each true correction:
 | **Prohibition / instruction** | *"never do X"*, *"remember that prices are in cents"* | **usually** |
 | Scope removal | *"drop that section"* | rarely |
 
+### The four shapes that are NOT corrections
+
+Most surviving candidates are one of these. Say so rather than stretching them into findings.
+
+| Not a correction | Looks like |
+|---|---|
+| **A new instruction** | *"now draft the outreach note"* — the previous answer was fine |
+| **An approval** | *"great, ship it"*, *"perfect, that's what I needed"* |
+| **A decision to do nothing** | *"let's leave it, infra rebuilds that box tomorrow"* |
+| **⚠️ An elicitation answer** | **the agent asked a question and the person answered it** |
+
+**The last one is the trap, and it is invisible unless you read the preceding turn.** Any skill
+that interviews the user — onboarding, `/init-*`, a requirements dialogue — produces dozens of
+short human replies that are structurally identical to a correction.
+
+Measured on one real Codex history: of 31 surviving candidates, **16 came from a single
+interview session**, where the agent asked *"прямой peer, жёсткий sparring partner, терпеливый
+coach?"* and the person replied *"терпеливый coach"*. Two words, directly after an agent turn,
+and not a correction at all.
+
+**The test:** did the agent's previous turn *ask* for this, or *assert* something the person is
+now pushing back on? Only the second is a correction.
+
 Report precision honestly: how many candidates you read, how many were corrections.
 
 ## Phase 3 — Cluster and stage

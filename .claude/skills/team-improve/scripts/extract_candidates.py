@@ -52,6 +52,9 @@ MACHINE_PREFIX = re.compile(
     r"|<realtime_delegation"
     r"|<codex_delegation"
     r"|The following is the Codex agent history"
+    # Codex UI injections: the editor prepends these when you attach files or a selection.
+    r"|# Files mentioned by the user:"
+    r"|# Selected text:"
     r")",
     re.I,
 )

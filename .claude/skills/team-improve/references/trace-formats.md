@@ -85,3 +85,12 @@ If you drive Codex from scripts, expect most of your log to be your own automati
 
 ⚠️ `~/.codex/history.jsonl` is **human prompts only** — no agent turns, so nothing can be
 paired. Point the extractor at `sessions/`, not at `history.jsonl`.
+
+**Two more Codex UI wrappers** are dropped: `# Files mentioned by the user:` and
+`# Selected text:` — the editor prepends these when you attach a file or a selection.
+
+**Expect low precision on an interview-heavy history.** Measured on one real Codex account:
+31 surviving candidates, of which **16 came from a single `/init-*` session** where the agent
+was asking the questions. Those are elicitation answers, not corrections — see SKILL.md
+Phase 2. The yield was **two genuine, transferable rules from ~200 sessions.** That is a
+realistic return, and both were things the person had forgotten they ever said.
