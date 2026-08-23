@@ -179,11 +179,19 @@ python3 .claude/skills/team-improve/scripts/run_cases.py improve/cases \
 Telegram/Slack by hand. **That is the path if your agent is not a CLI**, and it is the one most
 of you should take.
 
-**Agent and grader must be different vendors.** A judge measurably prefers its own family's
-output, so a same-model grade is not independent. The script warns you if they match.
+**Only the grader has to be independent, and only at this step.** Everything before this
+runs fine on the one agent you already have.
 
-No second vendor? Use `--agent none` and paste the answer by hand — you still get a graded
-result. A case with empty `expected_signals` is reported **UNGRADED**, not passed.
+**No second vendor? You are not blocked.** Use `--grader none` — the script walks you through
+the criteria one at a time and *you* score it. Better still, hand it to the person next to you.
+
+| You have | `--agent` | `--grader` |
+|---|---|---|
+| Two vendors | yours | the other one |
+| **One CLI** | yours | **`none`** — you or a colleague score it |
+| One vendor, two models | `claude -p` | `claude -p --model sonnet` — weak, the script warns |
+
+A case with empty `expected_signals` is reported **UNGRADED**, never passed.
 
 ---
 

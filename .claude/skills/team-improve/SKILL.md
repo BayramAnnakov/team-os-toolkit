@@ -157,14 +157,34 @@ Three rules the runner enforces, and you must not work around:
 
 1. **A case with empty `expected_signals` is UNGRADED, not passed.** The human writes the
    criteria. A run that grades against nothing is worse than no run.
-2. **The grader must be a different model from the agent under test.** Judges measurably
-   prefer their own family's output, so a same-model grade is not independent evidence.
+2. **The grader must not be the party that proposed the change.** Evaluators measurably
+   prefer their own generations, so a same-model grade is not independent evidence.
+   **A different vendor satisfies this. So does a person** — see below.
 3. **A tool failure is not a score of zero.** An agent that could not be reached and an
    agent that answered wrongly are different events. Never let one be reported as the other.
 
-No second vendor available? **`--agent none --grader none`** — a person pastes the answer and
-a person grades it, criterion by criterion. Nothing leaves the machine. That is a *better* run
-than a same-model one, not a worse one.
+### Where independence is required — and where it is not
+
+**Only here, and only for the grader.** Phases 1–4 run on whatever single agent the person
+already has, and that is fine: Phase 2 classifies *past* turns rather than grading its own
+current work, and the independence in Phase 4 is the **human** writing `expected_signals`, not
+a second model.
+
+So a person with one CLI and no second vendor is **not blocked from any part of this skill.**
+
+| They have | `--agent` | `--grader` | Independent? |
+|---|---|---|---|
+| A second vendor | their agent | the other vendor | ✅ |
+| **Only one CLI** | their agent | **`none`** — a person grades | ✅ **strongest** |
+| Only one CLI, someone nearby | their agent | `none`, and a **colleague** scores | ✅ strongest |
+| Only one vendor, two models | `claude -p` | `claude -p --model sonnet` | ⚠️ weak — the script warns |
+
+**`--agent none --grader none`** — a person pastes the answer and a person grades it, criterion
+by criterion. Nothing leaves the machine. That is a *better* run than a same-model one, not a
+worse one.
+
+The requirement was never "two vendors". It is: **the party that proposed the change must not
+be the party that scores it.**
 
 ## Phase 6 — Report and hand over
 
