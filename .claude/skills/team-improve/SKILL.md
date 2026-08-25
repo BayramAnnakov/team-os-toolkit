@@ -36,6 +36,12 @@ The script keeps only human-typed turns that directly follow an agent reply, and
 results, scheduled prompts, skill preambles, compact summaries and inter-agent messages.
 Report its counts to the user before going on — the funnel is itself the first lesson.
 
+**Say what the funnel costs, at the moment you report it.** Two separate filters are doing the
+narrowing, and they blind the method in different ways: dropping tool results removes what the
+answer *cost* to produce, and keeping only human turns that follow an agent reply removes every
+wrong answer nobody replied to. **A clean extract means few typed corrections, not few errors.**
+`references/trace-formats.md` → *Known limits* is the full list — read it rather than these two.
+
 ## Phase 2 — Judge, semantically
 
 Read each candidate as a pair: what the agent said, then what the person said back. Decide
@@ -163,6 +169,56 @@ Three rules the runner enforces, and you must not work around:
 3. **A tool failure is not a score of zero.** An agent that could not be reached and an
    agent that answered wrongly are different events. Never let one be reported as the other.
 
+### Run it before the change, not after
+
+One score tells you where you are. It cannot tell you what the change cost, and that is the
+question that actually decides a promotion: **a correct one-line change can break a line a
+hundred lines above it, added by someone else, at another time.** So the run that matters is the
+one standing between "I looked at it" and "I approved it".
+
+```bash
+# 1. before you change anything — this is the baseline
+python3 .claude/skills/team-improve/scripts/run_cases.py improve/cases \
+  --agent '<agent>' --grader '<a DIFFERENT vendor>'
+
+# 2. make the change, then re-run against that baseline
+python3 .claude/skills/team-improve/scripts/run_cases.py improve/cases \
+  --agent '<agent>' --grader '<a DIFFERENT vendor>' \
+  --baseline improve/results/latest.json
+```
+
+It compares **criterion by criterion, never totals** — a moved total is the least informative
+number here. A run without `--baseline` writes `results/latest.json` and rolls the one before it
+to `previous.json`. A run *with* `--baseline` writes `results/candidate.json` and **leaves
+`latest.json` untouched**, so that re-running the same gate command does not quietly replace the
+baseline with the candidate and then compare the candidate against itself.
+
+The exit code is the verdict, and there are **three**:
+
+| | |
+|---|---|
+| `0` | compared, nothing regressed |
+| `1` | compared, something that used to pass now fails |
+| `2` | **no verdict** — not comparable, or nothing was compared at all |
+
+**Treat `2` the way you treat `1`.** It is the one that matters: a gate exiting 0 because every
+case was excluded looks identical to a gate exiting 0 because the change was safe.
+
+It returns `2` rather than a score in three situations, and the third is the one that catches
+real mistakes:
+
+- the **grader or agent command changed** — two graders disagree on the same answer often enough
+  that a cross-grader "regression" is mostly variance. It still prints the differences, labelled
+  as information, and refuses to call them a verdict.
+- **nothing comparable survived** at all.
+- **something the baseline measured was not measured this time.** A case that used to pass and
+  has now vanished, crashed, had its criteria edited, or lost its grader verdict is reported as
+  **LOST**, and lost measurements block certification. This is not pedantry: deleting the failing
+  case, or an agent that crashes on it, are the two cheapest ways to make a gate go green, and
+  both used to exit `0`.
+
+A criterion neither run has a verdict for is recorded as `null` and scored neither way.
+
 ### Where independence is required — and where it is not
 
 **Only here, and only for the grader.** Phases 1–4 run on whatever single agent the person
@@ -191,6 +247,15 @@ be the party that scores it.**
 Write `improve/REPORT.md`: the funnel counts, precision, clusters kept and cut with reasons,
 cases written, **the scored result**, and — explicitly — **what this pass could not see**
 (see `references/trace-formats.md` → *Known limits*).
+
+Write that section against the **whole** of *Known limits*, not a favourite pair — and not as a
+link. Name the ones that actually bit this corpus, and say what each means for the list you just
+produced. A short candidate list reads as good news unless you say why it might not be.
+
+**If this pass was requested because someone asked about cost, latency or wasted work, say
+plainly that `/team-improve` did not measure that.** Then either attach a separate pass with a
+denominator and real numbers (`references/execution-waste.md`), or state that this run cannot
+answer the question. A pointer to a procedure nobody ran is not an answer.
 
 Close with the three conditions a change must meet before it becomes permanent behaviour:
 **a named human · a versioned diff · a number on a frozen set the proposing agent did not
