@@ -49,6 +49,40 @@ Emit as JSONL, one row per line.
 
 ## Known limits — read before trusting a run
 
+- **A wrong answer nobody challenged.** The evidence base is *corrections people typed*. The
+  filter keeps a human turn only when it follows an agent reply, and Phase 2 judges that pair —
+  so an answer that was wrong and got accepted produces no pair to judge, and therefore no
+  candidate and no cluster. (Phase 4 can still reach one: a human may add a case the mining could
+  not have produced. That is the only route in.) **A clean report means "few typed corrections",
+  never "few errors."** Note this is a different blindness from the team's: they *saw* the answer
+  and accepted it — one production agent ran an entire investigation against the wrong git
+  branch, and it surfaced days later, from another route. They eventually found out; the miner
+  never would have. A better miner does not fix this, because there is nothing in the trace to
+  find. What helps is making a wrong answer cheaper to falsify at read time — stating the source,
+  branch, commit or query the answer rests on. That does not manufacture a correction (people
+  ignore cited sources too); it lowers the cost of noticing, and noticing is what this loop eats.
+- **How the answer was reached.** Phase 1 drops tool results and token events by design, and
+  Phase 2 reads only the pair `agent reply → human reply`. Duplicate tool calls, searching the
+  wrong source and redoing the work, an unchanged strategy after an error, context growth and
+  effort tier are outside this instrument. Whether that waste is larger or smaller than the
+  semantic defects is not something a run of this skill can tell you — it is a different
+  measurement, against a number rather than a human's criterion. `execution-waste.md` is how to
+  run it separately. Note the partial exception: the last 1,200 characters of the agent's reply
+  *are* kept, and agents often narrate the path they took, so some of this is visible in text
+  even though the tool records are gone.
+- **The scoring runtime is not the production runtime.** Mining reads multi-turn sessions with
+  tools. `run_cases.py` scores a **single-shot question and a string answer** (`claude -p {q}` by
+  default). It does not replay tool use, context growth, a wrong-branch checkout, sub-agents or
+  model tier. Two consequences: a case often cannot reproduce the session defect its candidate
+  came from, and a frozen set cannot detect a change that made the agent *verify less* unless the
+  verification is observable in the answer text. Write criteria that make it observable — *names
+  the branch it read*, *cites the row count it saw* — or accept that the suite is scoring
+  something narrower than the incident.
+- **Discarded prompt scaffolding.** Phase 1 drops skill preambles and, for Codex, the assembled
+  user turn that includes injected `AGENTS.md`. So the miner cannot see that the agent was
+  *obeying written instructions* when it did the thing someone corrected. You will stage
+  "stop doing X" while X sits in a file you discarded. Before promoting any candidate, grep the
+  active instruction set for the behaviour you are about to prohibit.
 - **Sessions in one file.** The generic reader treats a file as one conversation. If your
   export concatenates conversations, split it per conversation or you will pair a human turn
   with the wrong agent reply.
